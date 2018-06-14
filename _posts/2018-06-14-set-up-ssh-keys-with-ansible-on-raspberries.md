@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Leverage Ansible to administer a cluster of Raspberry Pi from a Unix or Windows machine
+title: [WIP] Leverage Ansible to administer a cluster of Raspberry Pi from a Unix or Windows machine
 ---
 
 As I was looking into what skills I want to learn or enforce, I made up an app as a side project, that would make use of all these technologies in a coherent whole. Some of these things being Infrastructure related, I found better to go ahead and buy a bunch of Raspberry Pi (or is it Raspberries ?).
