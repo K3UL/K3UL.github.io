@@ -18,7 +18,7 @@ Here I am going to detail the two primary objectives to get started : Install an
 ## Hardware
 * 3 Raspberry Pi B. I believe the model is not particulary important, except for the fact that I have out-of-the-box Wi-Fi with those.
 * A bunch of accessories : 3 USB cables, one A/C to USB thingy, 3 Pi cases.
-* A control machine on Windows 10. It can be a Linux machine, a Mac, one of the Raspberry, maybe even an Android device.
+* A control machine on Windows 10. It could be a Linux machine, a Mac, one of the Raspberry, or even [apparently an Android device](https://gist.github.com/hirschnase/9c2a0c6334f55bfdb373cc14dcbdf167).
 The important part here is that I wanted to use my Windows machine as the Control Machine, and keep my 3 raspberries for the cluster, 2 being too few for my tests (and money not being infinite !). 
 It also brought up an opportunity to have a bit more fun since Windows is not supported for Control Machine.
 
@@ -72,3 +72,46 @@ On the first boot, the Pi will connect to the Wi-Fi and that file will be moved 
 
 #### Setup fixed IP
 If you want to be able to manage your cluster easily, I find it best to use fixed IP, if possible following each other.
+To do so completely headless, we're going to specify a new MAC address for the Pi, and set our router/internet box to give it the IP we want.
+
+First, check what IP are taken on your network, and try to find 3 (or more if you have more Pis) following each other that are free. In my case I took the following
+* 192.168.1.20
+* 192.168.1.21
+* 192.168.1.22
+
+For each of those, let's generate a new MAC address. To do so, we can use the following website : [MAC Address Generator](https://www.miniwebtool.com/mac-address-generator/). Choose the longest format (should be chosen by default) and press the *Generate* button.
+
+Then, open with your text editor the file `cmdline.txt` located on the boot partition. It should be some arguments separated by spaces. At the end of it, add a space, and then `smsc95xx.macaddr=XX:XX:XX:XX:XX:XX` with the XX being your generated MAC address.
+
+Finally, go to your router/internet box, find the DHCP settings, and make the right MAC address point to the IP you want. This part depends on your device and I can't tell you more about it.
+
+#### Opening SSH access
+In order to be able to access the Pis, we need to enable SSH, since it's disabled by default.
+To enable it, it's quite easy, you just create a file, empty, named `ssh` (no extension) on the boot partition.
+That's it !
+
+### Run it !
+The SD cards being ready, just put them in the Raspberry Pis, power them, and you should be all set.
+After a few seconds, you should be able to SSH into them, with the IP you chose.
+
+The default user is `pi` and the default password is `raspberry`.
+
+## Ansible Control Machine
+### Using a Windows machine
+Since Windows is not supported as a Control Machine for Ansible, and since I really want to use my Windows machine, I decided to take advantage that I have a recent enough Windows 10 version, and use WSL (Windows Subsystem for Linux).
+If you don't know what it is, I suggest you read [the official page](https://docs.microsoft.com/en-us/windows/wsl/about) but if you want to know the essence of it, it is kind of a Linux system inside your Windows, like a virtual machine without much of the overhead.
+
+#### Activating WSL
+To enable WSL, you need Windows 10, and it has to be minimum the build 16215 (Fall Creators Update) for these steps.
+Open a Powershell prompt as Admin, enter the following, and press Enter :
+{% highlight powershell %}
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+{% endhighlight %}
+
+Restart the computer and WSL will be enabled.
+
+#### Getting a Linux distribution
+Just head to the *Microsoft Store*, somewhere in your Start Menu. Then look for the Linux distro you want ; in my case I chose Debian.
+Just install it like any app and then you can launch it whenever you want through the start menu. It will then open a terminal inside the Linux.
+
+In my case I also wanted to be able to SSH into the WSL, allowing me to have all the sessions (Raspberries and the control WSL machine) in one single place ([MobaXterm](https://mobaxterm.mobatek.net) in my case). To enable SSH in WSL, 
