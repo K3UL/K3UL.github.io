@@ -142,3 +142,15 @@ sudo apt-get install libssl-dev git sshpass
 {% endhighlight %}
 
 Libssl and sshpass will be useful for ssh connections, and git will be useful when we want to get to CI/CD.
+
+#### Installing PIP
+PIP is a Python package manager and will be useful to install Ansible and manage releases and upgrades. Installing PIP is as easy as running this one command :
+{% highlight shell %}
+sudo easy_install pip
+{% endhighlight %}
+
+#### Installing Ansible
+Finally, now that we're all set, installing the latest release of Ansible is also as easy as one command, using PIP :
+{% highlight shell %}
+sudo pip install ansible
+{% endhighlight %}
