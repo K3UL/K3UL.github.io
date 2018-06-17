@@ -3,9 +3,9 @@ layout: post
 title: WIP - Leverage Ansible to administer a cluster of Raspberry Pi from a Unix or Windows machine
 ---
 
-As I was looking into what skills I want to learn or enforce, I made up an app as a side project, that would make use of all these technologies in a coherent whole. Some of these things being Infrastructure related, I found better to go ahead and buy a bunch of Raspberry Pi (or is it Raspberries ?).
+Wanting to go ahead with getting my Infrastructure skills up-to-date, I went ahead and bought a bunch of Raspberry Pi.
 
-The first task I found would be interesting is to administer the Rasps with Ansible. By administer I mean :
+The first task I found would be interesting is to administer the *Rasps* with Ansible. By administer I mean :
 * Manage the inventory of the machines available
 * Harmonize OS configuration
 * Deploy SSH keys for multiple users, in the most dynamic way possible. What I want is a solution to use at home, but knowledge that I can use in a big corporate environment.
@@ -114,4 +114,31 @@ Restart the computer and WSL will be enabled.
 Just head to the *Microsoft Store*, somewhere in your Start Menu. Then look for the Linux distro you want ; in my case I chose Debian.
 Just install it like any app and then you can launch it whenever you want through the start menu. It will then open a terminal inside the Linux.
 
-In my case I also wanted to be able to SSH into the WSL, allowing me to have all the sessions (Raspberries and the control WSL machine) in one single place ([MobaXterm](https://mobaxterm.mobatek.net) in my case). To enable SSH in WSL, 
+In my case I also wanted to be able to SSH into the WSL, allowing me to have all the sessions (Raspberries and the control WSL machine) in one single place ([MobaXterm](https://mobaxterm.mobatek.net) in my case). 
+To enable SSH in WSL :
+* First run `sudo apt-get update` to get the OS updated
+* Install OpenSSH : `sudo apt-get install openssh-server`
+* Edit the file `/etc/ssh/sshd_config` and put the options `UsePrivilegeSeparation no` and `PasswordAuthentication yes`. For the first one, I had to uncomment it and change its default value `sandbox`. For the second one, I only had to uncomment.
+* If you want you can also change the 22 port to something else. Otherwise you might have to authorise incoming 22 connections in your firewall ; I'm not using the Windows Firewall, but another, and didn't have any problem.
+* Start SSH : `sudo service ssh start`
+> You will have to start SSH with the `service` command at every Windows restart. It's possible though to [automate it](https://superuser.com/a/1112022/411969), which I didn't do because I was fine with the way it is.
+
+Voilà, you're ready to SSH into your WSL !
+
+### Installing Ansible (and PIP and Python)
+Now, we have a working Control machine, whether it's through Windows and WSL, or directly a UNIX machine.
+We need to have Python 2.6/7 or 3.5+ installed on the control machine. If you already have it (you can check with the `python -V` and `python3 -V` commands) you can skip this install.
+
+#### Installing Python
+To install Python and some other useful tools, type the following commands :
+{% highlight shell %}
+sudo apt-get install software-properties-common
+sudo apt-get install python-setuptools python-dev libffi-dev
+{% endhighlight %}
+
+We can also install some additional tools :
+{% highlight shell %}
+sudo apt-get install libssl-dev git sshpass
+{% endhighlight %}
+
+Libssl and sshpass will be useful for ssh connections, and git will be useful when we want to get to CI/CD.
