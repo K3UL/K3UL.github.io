@@ -181,6 +181,7 @@ The inventory can take several forms and can be dynamically made with several fi
 
 ##### Recap of the machines
 In my case I have three Pi (I put the names on little post-it on them), with consecutive addresses :
+
 | Name    | IP           | Role        |
 |---------|--------------|-------------|
 | TheGood | 192.168.1.20 | Master node |
