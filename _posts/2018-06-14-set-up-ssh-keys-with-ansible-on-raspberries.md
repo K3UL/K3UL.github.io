@@ -143,6 +143,8 @@ sudo apt-get install libssl-dev git sshpass
 
 Libssl and sshpass will be useful for ssh connections, and git will be useful when we want to get to CI/CD.
 
+**Warning** : You will need Python installed on all your machines, including the ones you're going to control. Now that you're into it would be a good time to do it everywhere ! I suggest also installing PIP (see below).
+
 #### Installing PIP
 PIP is a Python package manager and will be useful to install Ansible and manage releases and upgrades. Installing PIP is as easy as running this one command :
 {% highlight shell %}
@@ -154,3 +156,80 @@ Finally, now that we're all set, installing the latest release of Ansible is als
 {% highlight shell %}
 sudo pip install ansible
 {% endhighlight %}
+
+Then you can check that Ansible is installed with the following :
+{% highlight shell %}
+ansible --version
+{% endhighlight %}
+
+This should give you the version number, and a little summary of some configuration.
+
+### Initial Ansible configuration
+#### Configuration file
+If you ran the `ansible --version` command, you may have noticed a line saying `config file = None`. We're going to create the config file, which will allows us to tweak Ansible as we need.
+Let's create an empty file and open it :
+{% highlight shell %}
+sudo nano /etc/ansible/ansible.cfg
+{% endhighlight %}
+
+To populate that file, head to [this address](https://raw.githubusercontent.com/ansible/ansible/devel/examples/ansible.cfg), copy all, and paste it in the file. Save, exit, voilà !
+Everything is commented in the file, but it's a good boilerplate and it's useful to know the default values for everything.
+
+#### Inventory
+To get started, we need an inventory of machines for Ansible to administer them.
+The inventory can take several forms and can be dynamically made with several files, use cloud-specific features... Here it will be the most basic form, which is a single file, since all we need to put is 3 little Pis. The usual file format used in examples is INI, but I chose to go with another officially supported format : YAML. The goal is to be coherent with the playbooks (which we'll see later) since they use YAML, and I also find YAML more complete than INI.
+
+##### Recap of the machines
+In my case I have three Pi (I put the names on little post-it on them), with consecutive addresses :
+| Name    | IP           | Role        |
+|---------|--------------|-------------|
+| TheGood | 192.168.1.20 | Master node |
+| TheBad  | 192.168.1.21 | Worker node |
+| TheUgly | 192.168.1.22 | Worker node |
+
+The 3 of them together will be referenced as **TheCluster**.
+
+##### Creating the inventory file with the hosts
+By convention the inventory is named `hosts` (INI) or as it will be the case here, `hosts.yml` (YAML). We'll place it also in the `/etc/ansible` directory.
+Create it by typing :
+{% highlight shell %}
+sudo nano /etc/ansible/hosts.yml
+{% endhighlight %}
+
+Then in my case, the content is the following. You can find the official example also [here](https://github.com/ansible/ansible/blob/devel/examples/hosts.yaml). You should read it in any case, as it contains the guidelines and valuable information on how to constitute the file.
+{% highlight yaml %}
+all:
+  TheCluster:
+    hosts:
+      192.168.1.2[0-2]:
+  children:
+    masters:
+      hosts:
+        TheGood:
+          ansible_host: 192.168.1.20
+          ansible_port: 22
+          ansible_user: pi
+          ansible_ssh_pass: REDACTED
+    workers:
+      hosts:
+        TheBad:
+          ansible_host: 192.168.1.21
+          ansible_port: 22
+          ansible_user: pi
+          ansible_ssh_pass: REDACTED
+        TheUgly:
+          ansible_host: 192.168.1.22
+          ansible_port: 22
+          ansible_user: pi
+          ansible_ssh_pass: REDACTED
+{% endhighlight %}
+
+A few precisions :
+* The hosts are present both in the `TheCluster` group and in the subgroups (`masters` and `workers`)
+* In the cluster definition you can see I used a range, but you need your IP to follow each other for that
+* I make Ansible connect with the `pi` user, which is a sudoer
+* I use, for now, password authentication and removed my passwords :)
+
+You can also check [this example](https://github.com/confluentinc/cp-ansible/blob/master/hosts.yml), that shows a more complete file, with groups related to domain of action for the hosts.
+
+That `hosts.yml` file is now enough for Ansible to contact the 3 machines and execute any playbook. Let's try it out, shall we ?
