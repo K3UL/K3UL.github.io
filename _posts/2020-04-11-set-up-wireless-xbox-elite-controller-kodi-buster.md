@@ -60,7 +60,9 @@ To fix that, open a terminal and run `sudo raspi-config`. There, choose _Advance
 Kodi is using _libinput_ to handle mice and keyboards, but we need to have libinput ignore the controller :
 ```bash
 echo 'SUBSYSTEM=="input", ATTRS{name}=="Xbox Elite Wireless Controller", KERNEL=="event*", MODE="0666", ENV{LIBINPUT_IGNORE_DEVICE}="1"'
+
 echo 'SUBSYSTEM=="input", ATTRS{name}=="Xbox Elite Wireless Controller", KERNEL=="event*", MODE="0666", ENV{ID_INPUT_JOYSTICK}="1"'
+
 sudo udevadm trigger
 ```
 Note that I used the name `Xbox Elite Wireless Controller`, but if you have a regular Xbox One wireless controller, it would probably be named `Xbox Wireless Controller`. You can check this with the dropdown menu when clicking the bluetooth icon in the taskbar.  
